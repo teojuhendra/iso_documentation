@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model File {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // "file" or "folder"
+  mimeType    String?  // MIME type for files
+  size        Int?     // File size in bytes
+  path        String?  // File path for storage
+  content     String?  // For text files or metadata
+  parentId    String?  // Parent folder ID
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  parent      File?    @relation("FileHierarchy", fields: [parentId], references: [id])
+  children    File[]   @relation("FileHierarchy")
+  
+  @@map("files")
+}
